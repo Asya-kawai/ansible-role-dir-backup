@@ -1,13 +1,17 @@
 ---
-backup_script_name: backup.sh
-backup_script_path: "{{ backup_script_dir.rstrip('/') }}/{{ backup_script_name }}"
+dir_backup_script_name: dir_backup.sh
+dir_backup_script_path: "{{ dir_backup_bin_dir.rstrip('/') }}/{{ dir_backup_script_name }}"
 
-backup_service_dir: /etc/systemd/system
-backup_service_name: backup.service
-backup_timer_dir: /etc/systemd/system
-backup_timer_name: backup.timer
+dir_backup_core_script_download_dir: /usr/local/src/dir-backup
+dir_backup_core_script_install_dir: /opt/bin
+dir_backup_core_script_name: _dir_backup.sh
 
-backup_service_path: "{{ backup_service_dir.rstrip('/') }}/{{ backup_service_name }}"
-backup_timer_path: "{{ backup_timer_dir.rstrip('/') }}/{{ backup_timer_name }}"
+dir_backup_service_dir: /etc/systemd/system
+dir_backup_service_name: dir_backup.service
+dir_backup_timer_dir: /etc/systemd/system
+dir_backup_timer_name: dir_backup.timer
+
+dir_backup_service_path: "{{ dir_backup_service_dir.rstrip('/') }}/{{ dir_backup_service_name }}"
+dir_backup_timer_path: "{{ dir_backup_timer_dir.rstrip('/') }}/{{ dir_backup_timer_name }}"
 
 dir_backup_path: "{{ dir_backup_dir.rstrip('/') }}/{{ dir_backup_name }}"

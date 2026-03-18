@@ -2,22 +2,24 @@
 
 [![CI](https://github.com/Asya-kawai/ansible-role-backup/actions/workflows/ci.yml/badge.svg)](https://github.com/Asya-kawai/ansible-role-backup/actions/workflows?query=workflow%3ACI)
 
+
 This Ansible role sets up backup scripts and systemd services to periodically archive specified directories as `.tar.gz` files and store them under a destination directory (default: `/var/backup/`).
 
-The backup process uses a shell script (`dir_backup.sh`) to create compressed archives of target directories. The backup targets and schedule are fully customizable.
+The backup process uses a shell script (`dir_backup.sh`) to create compressed archives of target directories. The backup targets, output directory, schedule, and user/group are fully customizable via variables.
 
 ## How It Works
 
-- The role installs backup scripts to `/opt/bin/`.
-- The main backup script (`backup.sh`) iterates over the `backup_targets` list and calls `dir_backup.sh` for each target.
-- Each target directory is archived as a `.tar.gz` file and placed under `/var/backup/<target_name>/`.
-- Backup is scheduled via systemd timer (`backup.timer`) according to the `backup.on_calender` variable.
+- The role installs backup scripts to the directory specified by `dir_backup_bin_dir` (default: `/opt/bin/`).
+- The main backup script (`backup.sh`) iterates over the `dir_backup_targets` list and calls `dir_backup.sh` for each target.
+- Each target directory is archived as a `.tar.gz` file and placed under the directory specified by `dir_backup_output_dir` (default: `/var/backup/<target_name>/`).
+- Backup is scheduled via systemd timer (`backup.timer`) according to the `dir_backup_on_calender` variable.
+- The backup script is downloaded from the repository specified by `dir_backup_core_script_repo`.
 
 ## User Requirements & Notes
 
-- **You must define `backup_targets`** in your inventory or group_vars. Example:
+- **You must define `dir_backup_targets`** in your inventory, group_vars, or playbook. Example:
   ```yaml
-  backup_targets:
+  dir_backup_targets:
     - name: nginx
       src: /usr/local/etc/nginx
     - name: etc
@@ -25,17 +27,35 @@ The backup process uses a shell script (`dir_backup.sh`) to create compressed ar
     - name: opt
       src: /opt
   ```
-- **Destination directory**: Default is `/var/backup/`. Ensure sufficient disk space.
-- **Permissions**: Backup scripts run as the user/group specified in `backup.user` and `backup.group`. Make sure these have access to all target directories.
-- **Schedule**: Set `backup.on_calender` in group_vars to control when backups run (systemd timer format).
-- **dir_backup.sh**: This script is downloaded from GitHub (`dir-backup` repo) and placed in `/opt/bin/`. Internet access is required for the initial download.
+- **Destination directory**: Set with `dir_backup_output_dir` (default: `/var/backup/`). Ensure sufficient disk space.
+- **Backup script location**: Set with `dir_backup_bin_dir` (default: `/opt/bin/`).
+- **Permissions**: Backup scripts run as the user/group specified in `dir_backup_user` and `dir_backup_group` (default: `root`). Make sure these have access to all target directories.
+- **Schedule**: Set `dir_backup_on_calender` to control when backups run (systemd timer format, e.g. `*-*-* 01:00:00`).
+- **Core script repo/version**: Set with `dir_backup_core_script_repo` and `dir_backup_core_script_version`.
 - **Systemd**: The role creates and enables `backup.service` and `backup.timer`. Ensure systemd is available and enabled on your host.
 - **Dry Run**: Use `--check` and `--diff` options with Ansible to preview changes.
 - **Restore**: This role only creates backups. Restoration must be handled manually.
 - **Customization**: All paths and variables can be overridden in your playbook or inventory.
 
-## Example Backup Target Configuration
-See `defaults/main.yml` for variable details.
+## Example Variable Configuration
+See `defaults/main.yml` for all available variables.
+
+```yaml
+dir_backup_targets:
+  - name: nginx
+    src: /usr/local/etc/nginx
+  - name: etc
+    src: /etc
+  - name: opt
+    src: /opt
+dir_backup_output_dir: /var/backup
+dir_backup_bin_dir: /opt/bin
+dir_backup_on_calender: '*-*-* 01:00:00'
+dir_backup_user: root
+dir_backup_group: root
+dir_backup_core_script_repo: https://github.com/Asya-kawai/dir-backup.git
+dir_backup_core_script_version: HEAD
+```
 
 # Examples
 

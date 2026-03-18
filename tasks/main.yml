@@ -35,7 +35,7 @@
 # For Ubuntu
 - name: Install OS packages for Debain
   package:
-    name: "{{ backup_debian_install }}"
+    name: "{{ dir_backup_debian_install }}"
     state: latest
   when: ansible_facts['os_family'] == 'Debian'
   tags:
@@ -48,7 +48,7 @@
 # For CentOS
 - name: Install OS packages for CentOS
   package:
-    name: "{{ backup_redhat_install }}"
+    name: "{{ dir_backup_redhat_install }}"
     state: latest
   when: ansible_facts['os_family'] == 'RedHat'
   tags:
@@ -58,9 +58,9 @@
     - appserver
     - dbserver
 
-- name: Create backup script directory
+- name: Create target directories backup script directory
   file:
-    path: "{{ backup_script_dir }}"
+    path: "{{ dir_backup_bin_dir }}"
     state: directory
     owner: root
     group: root
@@ -72,10 +72,10 @@
     - appserver
     - dbserver
 
-- name: Configure a backup script
+- name: Configure a target directories backup script
   template:
-    src: "{{ backup_script_path.lstrip('/') }}.j2"
-    dest: "{{ backup_script_path }}"
+    src: "{{ dir_backup_script_path.lstrip('/') }}.j2"
+    dest: "{{ dir_backup_script_path }}"
     owner: root
     group: root
     mode: 0755
@@ -86,41 +86,41 @@
     - appserver
     - dbserver
 
-- name: Download a dir backup script from github
+- name: Download a core dir backup script from github
   git:
-    repo: "{{ dir_backup_repo }}"
-    dest: "{{ dir_backup_dest }}"
-    version: "{{ dir_backup_version }}"
+    repo: "{{ dir_backup_core_script_repo }}"
+    dest: "{{ dir_backup_core_script_download_dir }}"
+    version: "{{ dir_backup_core_script_version }}"
   tags:
     - dir-backup
-    - dir-backup-download-dir-backup-script
+    - dir-backup-download-core-dir-backup-script
     - webserver
     - appserver
     - dbserver
 
-- name: Check the dir backup script exists
+- name: Check the core dir backup script exists
   stat:
-    path: "{{ dir_backup_dest.rstrip('/') }}/{{ dir_backup_name }}"
+    path: "{{ dir_backup_core_script_download_dir.rstrip('/') }}/{{ dir_backup_core_script_name }}"
   register: dir_backup
   tags:
     - dir-backup
-    - dir-backup-check-dir-backup-script-exists
+    - dir-backup-check-core-dir-backup-script-exists
     - webserver
     - appserver
     - dbserver
 
-- name: Copy a dir backup script
+- name: Copy a core dir backup script
   copy:
     remote_src: yes
-    src: "{{ dir_backup_dest.rstrip('/') }}/{{ dir_backup_name }}"
-    dest: "{{ dir_backup_path }}"
+    src: "{{ dir_backup_core_script_download_dir.rstrip('/') }}/{{ dir_backup_core_script_name }}"
+    dest: "{{ dir_backup_core_script_install_dir.rstrip('/') }}/{{ dir_backup_core_script_name }}"
     owner: root
     group: root
     mode: 0755
   when: dir_backup.stat.exists
   tags:
     - dir-backup
-    - dir-backup-copy-dir-backup-script
+    - dir-backup-copy-core-dir-backup-script
     - webserver
     - appserver
     - dbserver
@@ -134,8 +134,8 @@
     group: root
     mode: 0644
   with_items:
-    - "{{ backup_service_path }}"
-    - "{{ backup_timer_path }}"
+    - "{{ dir_backup_service_path }}"
+    - "{{ dir_backup_timer_path }}"
   tags:
     - dir-backup
     - dir-backup-create-backup-services
@@ -145,8 +145,8 @@
 
 - name: Check backup timer exists
   stat:
-    path: "{{ backup_timer_path }}"
-  register: backup_timer_path_result
+    path: "{{ dir_backup_timer_path }}"
+  register: dir_backup_timer_path_result
   tags:
     - dir-backup
     - dir-backup-check-backup-timer
@@ -156,11 +156,11 @@
 
 - name: Enable backup timer
   systemd:
-    name: "{{ backup_timer_name }}"
+    name: "{{ dir_backup_timer_name }}"
     state: started
     enabled: true
     daemon-reload: true
-  when: backup_timer_path_result.stat.exists
+  when: dir_backup_timer_path_result.stat.exists
   tags:
     - dir-backup
     - dir-backup-enable-backup-timer

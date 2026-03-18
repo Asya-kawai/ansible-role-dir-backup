@@ -1,25 +1,23 @@
 ---
-backup_debian_install:
+dir_backup_debian_install:
   - git
-backup_redhat_install:
+dir_backup_redhat_install:
   - git
 
-backup_user: root
-backup_group: root
+dir_backup_user: root
+dir_backup_group: root
 
-backup_script_dir: /opt/bin
-backup_on_calender: '*-*-* 00:00:00'
+dir_backup_bin_dir: /opt/bin
+dir_backup_output_dir: /var/backup
+dir_backup_on_calender: '*-*-* 00:00:00'
 
-dir_backup_repo: https://github.com/Asya-kawai/dir-backup.git
-dir_backup_dest: /usr/local/src/dir-backup
-dir_backup_dir: /opt/bin
-dir_backup_name: dir_backup.sh
-dir_backup_version: HEAD
+dir_backup_core_script_repo: https://github.com/Asya-kawai/dir-backup.git
+dir_backup_core_script_version: HEAD
 
-backup_targets: []
-# backup_targets is a list of objects having fileds of 'name' and 'src'.
+dir_backup_targets: []
+# dir_backup_targets is a list of objects having fileds of 'name' and 'src'.
 # ---
-# backup_targets:
+# dir_backup_targets:
 #   - name: nginx
 #     src: /usr/local/etc/nginx
 #   - name: etc
