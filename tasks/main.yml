@@ -33,7 +33,7 @@
     - dbserver
 
 # For Ubuntu
-- name: Install OS packages for Debain
+- name: Install OS packages for Debian
   package:
     name: "{{ dir_backup_debian_install }}"
     state: latest
